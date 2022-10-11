@@ -23,9 +23,9 @@
 ## Configuration
 
 Included in the repository is an example config (``config.json.example``) which contains the following hierarchy. When ready to use rename to ``config.json``.
-```json
+```
 config.json
-└───colours // decimal colours for various embeds.
+└───colours // decimal colours used for colouring embeds.
 │   │   default
 │   │   ...
 │   
