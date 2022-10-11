@@ -25,7 +25,7 @@ function ytdl:__init(url, search)
 		table.insert(args, 1, "--default-search")
 	end
 
-	child = assert(uv.spawn("youtube-dl.bat", {
+	child = assert(uv.spawn("youtube-dl", {
 		args = args,
 		stdio = { 0, stdout, 2 },
 	}), "youtube-dl could not be started, is it installed and on your executable path?")
