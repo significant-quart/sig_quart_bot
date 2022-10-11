@@ -1,4 +1,4 @@
-local command = require("discordia").class("command")
+local command = require("Discordia").class("command")
 
 
 local commands = {}
