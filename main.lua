@@ -1,4 +1,4 @@
-local discordia = require("discordia")
+local discordia = require("Discordia")
 local JSON = require("json")
 local fs = require("fs")
 local commands = require("commands")
