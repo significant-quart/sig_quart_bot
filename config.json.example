@@ -1,0 +1,10 @@
+{
+    "colours": {
+        "default": "11147545"
+    },
+    "keys": {
+        "rapid": ""
+    },
+    "prefix": ".",
+    "debug": false
+}

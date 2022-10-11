@@ -1,0 +1,16 @@
+.token
+*.dll
+
+.vscode/
+
+deps/
+
+discordia*.log
+gateway*.json
+
+config.json
+
+sqlite3.def
+
+modules/nsfw.*
+modules/sandbox.lua
