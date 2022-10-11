@@ -4,7 +4,7 @@ local json = require("json")
 local running, resume, yield = coroutine.running, coroutine.resume, coroutine.yield
 
 
-local ytdl = require("../deps/discordia/libs/class")("ytdl")
+local ytdl = require("../deps/Discordia/libs/class")("ytdl")
 
 
 function ytdl:__init(url, search)
