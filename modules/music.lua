@@ -65,8 +65,6 @@ local function deleteTimeout()
     end
 
     if currentlyPlaying.timeout then
-        p("removed old timeout")
-
         timer.clearTimeout(currentlyPlaying.timeout)
     end
 end
@@ -84,12 +82,8 @@ local function createTimeout()
     end
 
     currentlyPlaying.timeout = timer.setTimeout(((currentlyPlaying.duration + 1) - elapsedTime) * 1000, coroutine.wrap(function()
-        p("evaluated skip")
-
         commands.GetAll()["skip"]:Evaluate(nil, nil, true)
     end))
-
-    p("made new timeout")
 end
 
 
