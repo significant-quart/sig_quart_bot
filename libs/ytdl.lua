@@ -9,7 +9,7 @@ local ytdl = require("../deps/Discordia/libs/class")("ytdl")
 
 function ytdl:__init(url, search)
 	local stdout = uv.new_pipe(false)
-	local child
+	local child, thread
 
 	local function close()
         child:kill()
@@ -19,7 +19,7 @@ function ytdl:__init(url, search)
         end
     end
 
-	local args = { "--dump-json", url }
+	local args = { "--no-playlist", "--dump-json", url }
 	if search then
 		table.insert(args, 1, "ytsearch")
 		table.insert(args, 1, "--default-search")
@@ -28,60 +28,69 @@ function ytdl:__init(url, search)
 	child = assert(uv.spawn("youtube-dl", {
 		args = args,
 		stdio = { 0, stdout, 2 },
-	}), "youtube-dl could not be started, is it installed and on your executable path?")
+	}, function()
+		close()
 
-	local thread = running()
+		return assert(resume(thread))
+	end), "youtube-dl could not be started, is it installed and on your executable path?")
+
+	thread = running()
+
+	self._buffer = ""
 
 	stdout:read_start(function(err, chunk)
-		if err or not chunk then
+		if err then
 			close()
-		else
-			self._buffer = chunk
+
+			return assert(resume(thread))
+		elseif chunk then
+			self._buffer = self._buffer..chunk
 		end
-
-		stdout:read_stop()
-
-        return assert(resume(thread))
 	end)
 
 	yield()
 end
 
 function ytdl:read()
-	self._buffer = json.decode(self._buffer)
-	self._data = {}
+	self._data = json.decode(self._buffer)
+	self._buffer = nil
 
-	if not self._buffer then
+	if not self._data then
 		return "video data could not be used", true
 	end
 
-	if not self._buffer.formats then
+	if not self._data.formats then
 		return "no formats could be found", true
 	end
 
-	if self._buffer.requested_formats then
-        for _, format in pairs(self._buffer.requested_formats) do
+	local audio
+
+	if self._data.requested_formats then
+        for _, format in pairs(self._data.requested_formats) do
             if format.url:find("mime=audio") then
-                self._data.audio = format.url
+                audio = format.url
 
                 break
             end
         end
-    elseif self._buffer.url then
-        self._data.audio = self._buffer.url
+    elseif self._data.url then
+        audio = self._data.url
     end
 
-	if not self._data.audio then
+	if not audio then
 		return "no suitable formats could be found", true
 	end
 
-	self._data.duration = (self._buffer.duration or 0.0)
-	self._data.live = (self._data.duration == 0.0)
-	self._data.title = (self._buffer.title or "")
-    self._data.thumbnail = (self._buffer.thumbnail or "")
-	self._data.url = (self._buffer.webpage_url or "")
 
-	return self._data, false
+	return {
+		audio = audio,
+		duration = self._data.duration,
+		live = (self._data.duration == 0.0),
+		title = self._data.title,
+		thumbnail = self._data.thumbnail,
+		url = self._data.webpage_url
+	}, false
 end
+
 
 return ytdl
