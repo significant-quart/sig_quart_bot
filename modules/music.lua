@@ -175,23 +175,20 @@ command("skip", function(args, message, force)
 
         currentlyPlaying = queue[1]
 
-        local channel = currentlyPlaying.message.channel
-        currentlyPlaying.message:delete()
-
         connection:playFFmpeg(currentlyPlaying.audio, nil, function()
             currentlyPlaying.start = os.time()
 
-            if channel then
-                currentlyPlaying.message = channel:send {
-                    embed = {
-                        description = F("**Now playing**\n[%s](%s) [%s]", currentlyPlaying.title, currentlyPlaying.url, currentlyPlaying.owner),
-                        color = config.colours.default,
-                        thumbnail = {
-                            url = currentlyPlaying.thumbnail
-                        }
+            local repsonse = currentlyPlaying.message.channel:send {
+                embed = {
+                    description = F("**Now playing**\n[%s](%s) [%s]", currentlyPlaying.title, currentlyPlaying.url, currentlyPlaying.owner),
+                    color = config.colours.default,
+                    thumbnail = {
+                        url = currentlyPlaying.thumbnail
                     }
                 }
-            end
+            }
+            currentlyPlaying.message:delete()
+            currentlyPlaying.message = repsonse
 
             table.remove(queue, 1)
 
