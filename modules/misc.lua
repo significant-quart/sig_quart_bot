@@ -32,7 +32,7 @@ end):Category("Fun Commands"):Description("Pong.")
 command("whois", function(args, message)
     local member
     if message.mentionedUsers and message.mentionedUsers.first then
-        member = assert(message.guild:getMember(member.mentionedUsers.first), "something went wrong")
+        member = assert(message.guild:getMember(message.mentionedUsers.first), "something went wrong")
     elseif args[2] and tonumber(args[2]) ~= nil then
         member = assert(message.guild:getMember(args[2]), "something went wrong")
     else
