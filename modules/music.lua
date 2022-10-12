@@ -24,7 +24,7 @@ local volume = 1.0
 
 local function formatTime(seconds, live)
     if live then
-        return "LIVE"
+        return "LIVE ⬤"
     end
 
 	seconds = tonumber(seconds)
@@ -50,13 +50,6 @@ local function calculateElapsedTime()
     end
 
     return (os.time() - currentlyPlaying.start) + currentlyPlaying.elapsedTime
-end
-
-local function calculateSeekDuration(time)
-    local hm, ms, s = time:match("^(%d+):(%d+)"..(#time > 5 and ":(%d+)" or ""))
-    hm, ms, s = (tonumber(hm) or 0), (tonumber(ms) or 0), (tonumber(s) or 0)
-
-    return (hm * 60 * (#time > 5 and 60 or 1)) + (ms * (#time > 5 and 60 or 1)) + s
 end
 
 local function deleteTimeout()
@@ -115,7 +108,7 @@ command("play", function(args, message)
     local search, query = false, ""
     local searchMessage
 
-    if not args[3] and args[2]:match("^h?t?t?p?s?:?/?/?www%.") then
+    if not args[3] and args[2]:match("^https?://") then
         query = args[2]
     else
         query = utilities.returnCommandInput(args)
@@ -126,7 +119,7 @@ command("play", function(args, message)
     local handle = ytdl(query, search)
     local data, err = handle:read()
 
-    assert(err == false, data)
+    assert(not err, data)
 
     if search then
         searchMessage:delete()
@@ -269,7 +262,7 @@ command("seek", function(args, message)
     assert(currentlyPlaying ~= nil, ERRORS.IDLE)
     assert(not currentlyPlaying.live, ERRORS.LIVE)
 
-    local seekDuration = calculateSeekDuration(args[2])
+    local seekDuration = utilities.clockToSeconds(args[2])
     assert(seekDuration > 0, ERRORS.WRONG_SEEK)
     assert(seekDuration <= currentlyPlaying.duration, ERRORS.LONG_SEEK)
 
